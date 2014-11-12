@@ -1,2 +1,3 @@
 treegrapher
+How to install:
 ===========
