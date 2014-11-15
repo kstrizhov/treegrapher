@@ -1,28 +1,33 @@
 package tree_grapher;
 
 
+import java.awt.Point;
+
 import javax.swing.JFrame;
 
-//import com.mxgraph.layout.hierarchical.model.mxGraphHierarchyNode;
+import com.mxgraph.canvas.mxICanvas;
+import com.mxgraph.layout.mxCompactTreeLayout;
+import com.mxgraph.layout.hierarchical.model.mxGraphHierarchyNode;
+import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
 
+
 public class TreeGr extends JFrame
-{
-	public static int nodequant = 20;
-	public static int nodenum = 0;	
-	public static int kvetvl = 3;
-	public static int x = 400;
-	public static int y = 20;
+{	
+	public static int numchildren = 3; //number of children
+	public static int kgen = 3;			//number of generations
+	public static Node flag;
 	
 	private static final long serialVersionUID = 1L;
 	
-	public Object MakeRootNode(mxGraph g, Object p)
+	public Node MakeRootNode(mxGraph g, Object p)
 	{
-		Object root = g.insertVertex(p, null, nodenum + " (Root)", x, y, 50, 20);
-		nodenum++;
-		y+=60;
+		Node root = new Node((mxCell) g.insertVertex(p, null,
+				" (Root)", 30, 400, 50, 20));
+		root.root = true;
 		return root;
 	}
 	
@@ -31,24 +36,27 @@ public class TreeGr extends JFrame
 //		return ;
 //	}
 	
-	public void MakeChildren(mxGraph g, Object p, Object r)
+/*	public void MakeChildren(mxGraph g, Object p, Node r)
 	{
 		if(nodenum < nodequant-1)
 		{
 			Object[] v;
 			v = new Object[kvetvl];
+			mxCell[] c = new mxCell[3];
 			for(int i = 0; i < 3; i++)
 			{
+				c[i] = (mxCell) g.addCell(p);
 				for(int j = 0; j <= kvetvl-1; j++)
 				{
 					v[j] = g.insertVertex(p, null, nodenum, x, y, 15, 15);
+					System.out.println(v[j].getClass());
 					g.insertEdge(p, null, "", r, v[j]);
 					nodenum++;
-					x+=20;
+					//x+=20;
 				}
 				r = v[i];
-				x-=20;
-				y+=40;
+				//x-=20;
+				//y+=40;
 //				MakeChildren(g, p, r);
 			}
 //			for(int j = 0; j <= kvetvl-1; j++)
@@ -64,20 +72,52 @@ public class TreeGr extends JFrame
 			MakeChildren(g, p, r);
 		}
 		
-	}
+	}*/
 	
-//	public void MakeChildren(mxGraph g, Object p, Object r)
-//	{
-//		Object[] v;
-//		v = new Object[kvetvl];
-//		for(int j = 0; j <= kvetvl-1; j++)
-//		{
-//			v[j] = g.insertVertex(p, null, nodenum, x, y, 15, 15);
-//			g.insertEdge(p, null, "", r, v[j]);
-//			nodenum++;
-//			x+=20;
-//		}
-//	}
+/*	public void MakeChildren(mxGraph g, Object p, Node r, int nc, int kg)
+	{
+		Node[] v = new Node[nc];
+		for(int i = 0; i < nc; i++)
+		{
+			v[i] = new Node((mxCell) g.insertVertex(p, null, i, 30, 30, 10, 10));
+			v[i].ancestor = r;
+			r.Child[i] = v[i];
+			g.insertEdge(p, null, "", v[i].ancestor.mc, v[i].mc);
+		}
+		kgen--;
+		r.cmade = true;
+		if(kgen == 0)
+		{
+			if (flag.root)
+				System.out.println("position: root");
+			if (!flag.root)
+			{
+				flag = flag.ancestor;
+				kgen++;
+				flag.ancestor.obrab++;
+			}
+		}
+		if(flag.obrab == 0 && flag.cmade)
+		{
+			flag = flag.Child[flag.obrab];
+			
+		}
+		
+	}*/
+	
+	public void MakeChildren(mxGraph g, Object p, Node r, int nc, int kg)
+	{
+		Node[] v = new Node[nc];
+		for(int i = 0; i < nc; i++)
+		{
+			v[i] = new Node((mxCell) g.insertVertex(p, null, i, 30, 30, 10, 10));
+			v[i].ancestor = r;
+			r.Child[i] = v[i];
+			g.insertEdge(p, null, "", v[i].ancestor.mc, v[i].mc);
+			if(kg>0)
+				MakeChildren(g, p, v[i], nc, kg-1);
+		}		
+	}
 
 	public  TreeGr()
 	{
@@ -88,8 +128,9 @@ public class TreeGr extends JFrame
 		graph.getModel().beginUpdate();
 		try
 		{
-			Object root = MakeRootNode(graph, parent);			
-			MakeChildren(graph, parent, root);
+			Node root = MakeRootNode(graph, parent);
+			flag = root;
+			MakeChildren(graph, parent, root, numchildren, kgen);
 		}
 		finally
 		{
@@ -97,6 +138,9 @@ public class TreeGr extends JFrame
 		}
 		final mxGraphComponent graphComponent = new mxGraphComponent(graph);
 		getContentPane().add(graphComponent);
+		
+	    mxCompactTreeLayout layout = new mxCompactTreeLayout(graph);
+	    layout.execute(graph.getDefaultParent());
 				
 	}
 	
