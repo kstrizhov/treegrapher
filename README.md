@@ -6,4 +6,6 @@ How to install:
 Выбрать директорию с проектом, нажать Select All, Finish.
 В Properties -> Java buildpath проекта переподцепить jgraphx.jar во вкладке Libraries и поставить галку в Order and Export.
 
+Run as -> Java app.
+
 ===========
