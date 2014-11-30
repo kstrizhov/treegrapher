@@ -72,6 +72,7 @@ public class TreeGr extends JFrame
 			graph.getModel().endUpdate();
 		}
 		final mxGraphComponent graphComponent = new mxGraphComponent(graph);
+		graphComponent.setConnectable(false);
 		getContentPane().add(graphComponent);
 		
 	    mxCompactTreeLayout layout = new mxCompactTreeLayout(graph, false);
@@ -79,14 +80,14 @@ public class TreeGr extends JFrame
 	    layout.setNodeDistance(5);
 	    layout.setEdgeRouting(false);
 	    
-	    Map<String, Object> style = graph.getStylesheet().getDefaultEdgeStyle();
-		style.put(mxConstants.STYLE_EDGE, mxEdgeStyle.TopToBottom);
+//	    Map<String, Object> style = graph.getStylesheet().getDefaultEdgeStyle();
+//		style.put(mxConstants.STYLE_EDGE, mxEdgeStyle.TopToBottom);
 		
 	    layout.execute(graph.getDefaultParent());
 	    
 	    graph.setCellsEditable(false);
-	    graph.setCellsSelectable(true);
-		graph.setCellsMovable(true);
+	    graph.setCellsSelectable(false);
+		graph.setCellsMovable(false);
 		graph.setCellsLocked(false);
 		graph.setSplitEnabled(false);
 		graph.setCellsDisconnectable(true);
