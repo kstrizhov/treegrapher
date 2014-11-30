@@ -1,53 +1,64 @@
 package tree_grapher;
 
 
-import java.awt.Point;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
-import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.layout.mxCompactTreeLayout;
-import com.mxgraph.layout.mxParallelEdgeLayout;
-import com.mxgraph.layout.hierarchical.model.mxGraphHierarchyNode;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.view.mxCellState;
-import com.mxgraph.view.mxEdgeStyle;
 import com.mxgraph.view.mxGraph;
-import com.mxgraph.view.mxStylesheet;
 
 
 
 public class TreeGr extends JFrame
 {	
 	public static int numchildren = 3; //number of children
-	public static int kgen = 1;			//number of generations
+	public static int kgen = 1;		//number of generations
+	public static int nodenum = 0;
 	
 	private static final long serialVersionUID = 1L;
 	
 	
 	public mxCell MakeRootNode(mxGraph g)
 	{		
-		return (mxCell) g.insertVertex(g.getDefaultParent(), null, "(Root)", 30, 400, 50, 50);
+		Node node = new Node();
+		
+		node.num = nodenum;
+		nodenum++;
+		node.ancestor = null;
+		node.label = "Root";
+		
+		return (mxCell) g.insertVertex(g.getDefaultParent(), null, node, 30, 400, 50, 50);
 	}
 
-	class Node
-	{
+	public class Node
+	{		
+		Node ancestor;
+		
+		ArrayList<Node> children = new ArrayList<TreeGr.Node>();
+		
+		public int num;
+		
+		public String label = "qqq"; 
+		
 		@Override
 		public String toString() {
-			return "qqq";
+			return label;
 		}
-		
+				
 	};
 
 	public void MakeChildren(mxGraph graph, mxCell parent, int kg)
 	{
 		for (int i = 0; i < numchildren; i++)
 		{
-			Object node = new Node();
+			Node node = new Node();
+			node.ancestor = (Node) parent.getValue();
+			node.num = nodenum;
+			nodenum++;
+			node.label = Integer.toString(node.num);
 			mxCell child = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, node, 30, 30, 50, 50);
 			graph.insertEdge(graph.getDefaultParent(), null, null, parent, child);
 			if (kg>0)
@@ -59,7 +70,6 @@ public class TreeGr extends JFrame
 	{
 		
 		final mxGraph graph = new mxGraph();
-		Object parent = graph.getDefaultParent();
 		
 		graph.getModel().beginUpdate();
 		try
@@ -72,7 +82,7 @@ public class TreeGr extends JFrame
 			graph.getModel().endUpdate();
 		}
 		final mxGraphComponent graphComponent = new mxGraphComponent(graph);
-		graphComponent.setConnectable(false);
+		graphComponent.setConnectable(false);	
 		getContentPane().add(graphComponent);
 		
 	    mxCompactTreeLayout layout = new mxCompactTreeLayout(graph, false);
