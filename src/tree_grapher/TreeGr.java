@@ -37,7 +37,7 @@ public class TreeGr extends JFrame
 	{		
 		Node ancestor;
 		
-		ArrayList<Node> children = new ArrayList<TreeGr.Node>();
+		ArrayList<Node> children = new ArrayList<Node>();
 		
 		public int num;
 		
@@ -47,6 +47,13 @@ public class TreeGr extends JFrame
 		public String toString() {
 			return label;
 		}
+		
+		public void addChild(mxCell parent, Node child) {
+			Node x = new Node();
+			x = (Node) parent.getValue();
+			x.children.add(child);
+			parent.setValue(x);			
+		}
 				
 	};
 
@@ -55,11 +62,15 @@ public class TreeGr extends JFrame
 		for (int i = 0; i < numchildren; i++)
 		{
 			Node node = new Node();
-			node.ancestor = (Node) parent.getValue();
+			node.ancestor = (Node) parent.getValue();			
 			node.num = nodenum;
 			nodenum++;
 			node.label = Integer.toString(node.num);
-			mxCell child = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, node, 30, 30, 50, 50);
+			mxCell child = (mxCell) graph.insertVertex(graph.getDefaultParent(), null,
+					node, 30, 30, 50, 50,"shadow=true");
+			((Node) parent.getValue()).addChild(parent, (Node) child.getValue());
+			String s = Integer.toString(((Node) parent.getValue()).num);
+			System.out.println(s);
 			graph.insertEdge(graph.getDefaultParent(), null, null, parent, child);
 			if (kg>0)
 				MakeChildren(graph, child, kg-1);
