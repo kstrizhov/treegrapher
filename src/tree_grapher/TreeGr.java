@@ -15,7 +15,7 @@ import com.mxgraph.view.mxGraph;
 public class TreeGr extends JFrame
 {	
 	public static int numchildren = 3; //number of children
-	public static int kgen = 1;		//number of generations
+	public static int kgen = 2;		//number of generations
 	public static int nodenum = 0;
 	
 	private static final long serialVersionUID = 1L;
@@ -30,18 +30,27 @@ public class TreeGr extends JFrame
 		node.ancestor = null;
 		node.label = "Root";
 		
-		return (mxCell) g.insertVertex(g.getDefaultParent(), null, node, 30, 400, 50, 50);
+		mxCell root = (mxCell) g.insertVertex(g.getDefaultParent(), null,
+				node, 30, 400, 50, 50,"fillColor=green");
+		
+		node.cell = root;
+		
+		return root;
 	}
 
 	public class Node
 	{		
 		Node ancestor;
 		
+		mxCell cell;
+		
 		ArrayList<Node> children = new ArrayList<Node>();
 		
 		public int num;
 		
-		public String label = "qqq"; 
+		public String label = "qqq";
+		
+		public String style;
 		
 		@Override
 		public String toString() {
@@ -66,8 +75,9 @@ public class TreeGr extends JFrame
 			node.num = nodenum;
 			nodenum++;
 			node.label = Integer.toString(node.num);
-			mxCell child = (mxCell) graph.insertVertex(graph.getDefaultParent(), null,
+			mxCell child = (mxCell) graph.insertVertex(graph.getDefaultParent(), Integer.toString(node.num),
 					node, 30, 30, 50, 50,"shadow=true");
+			node.cell = child;
 			((Node) parent.getValue()).addChild(parent, (Node) child.getValue());
 			String s = Integer.toString(((Node) parent.getValue()).num);
 			System.out.println(s);
@@ -75,6 +85,21 @@ public class TreeGr extends JFrame
 			if (kg>0)
 				MakeChildren(graph, child, kg-1);
 		}	
+	}
+	
+	public void colorNodes(Node node)
+	{
+		int size = node.children.size();
+		for (int i = 0; i < size; i++) {
+			System.out.println("num = " + node.children.get(i).num);
+			if ( i == 0  && node.cell.getStyle() == "fillColor=green")
+			{
+				node.children.get(i).cell.setStyle("fillColor=green");
+				String s = node.children.get(i).cell.getStyle();
+				System.out.println("child num " + node.children.get(i).num + " " + s);
+			}
+			colorNodes(node.children.get(i));			
+		}
 	}
 
 	public  TreeGr()
@@ -87,6 +112,8 @@ public class TreeGr extends JFrame
 		{
 			mxCell root = MakeRootNode(graph);
 			MakeChildren(graph, root, kgen);
+			Node rootnode = (Node) root.getValue();
+			colorNodes(rootnode);
 		}
 		finally
 		{
